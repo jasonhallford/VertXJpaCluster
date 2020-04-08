@@ -1,14 +1,11 @@
 ## Introduction
-This repository contains example code for integrating [Eclipse Vert.x](http://vertx.io) with the Java Persistence API 
-(JPA) 2.2 in a Java SE 11 runtime. Here, we use Hibernate as the JPA implementation, although any JPA 2.2-compliant ORM 
-should work. To minimized the difficulty of installing and running the example, persistence is provided by an embedded
-instance of the H2 database. Connections are pooled via the high-performance [Hikari](https://github.com/brettwooldridge/HikariCP)
-connection pool.
+This repository demonstrates a simple [Eclipse Vert.x](http://vertx.io)  cluster, built on Hazelcast, that comprises
+two members, here called "nodes":
+1. An API node that listens for web request on TCP/8080
+1. A JPA node that manages an embedded H2 database 
 
-Yes, this is overkill.
-
-Nevertheless, the author thought it worth the negligible increase in complexity to demonstrate how one might implement
-efficient connection pooling in a Java SE environment.
+Nodes communicate via Vert.x's distributed event bus. Excepting this distributed nature, the example
+is functionally equivalent to [VertXJpa](https://github.com/jasonhallford/VertXJpa).
 
 ## Requirements
 To build this example, you will need the following:
@@ -20,19 +17,30 @@ nicely)
 ## Building the Project
 You may build the example in one of two ways, as a JAR or a Docker image. 
 ### Maven Build
-You may build JAR from source using [Apache Maven](http://maven.apache.org). Assuming a version >= 3.6.0 you can build it  by
-executing `mvn package` at the command line (assuming `mvn` is in the path, of course). In the project's /target
-directory, this will produce
-* A JAR file named __vertx-jpa-1.2.jar__, which contains just the project's classes
-* A fat JAR named __vertx-jpa-1.2-fat.jar__; you can use this to run the code by executing `java -jar VertXJpa-1.0-fat.jar`
-at your favorite command line
-### Building as a Docker Image
-You may use the included Dockerfile to create a deployable image. From the source directory, run the following
-command to build the image: `docker build -t vertxjpa:1.2 .`. Here, the resulting image will have the tag
-__vertxjpa:1.2__. 
+You may build JAR from source using [Apache Maven](http://maven.apache.org). Assuming a version >= 3.5.0 you can build it  by
+executing `mvn package` at the command line (assuming `mvn` is in the path, of course). As this is a multi-module
+project, it produces two separate sets of artifacts:
+* JARs named __jpa-node-1.2.jar__ and __jpa-node-1.2-fat.jar__ in <span style="font-family: monospace;">/jpa-node/target</span> 
+for the JPA node
+* JARs named __api-node-1.2.jar__ and __api-node-1.2-fat.jar__ in <span style="font-family: monospace;">/api-node/target</span>
+for the API node
 
-Run the container with the following command: `docker run --rm -p 8080:8080 --name vertxjpa vertxjpa:1.0`. You will 
-be able to connect to the app at http://localhost:8080.
+### Building as a Docker Image
+You may use the included Dockerfile to create a deployable images, one for each node. To do this, run `docker build` from
+the _parent_ directory so that the entire source tree is included in the build context. For example, to build the
+API image you would run the following:
+```shell script
+../vertx-jpa-cluster$ docker build -t vertx-api-node:1.2 --file ./api-node/Dockerfile .
+``` 
+You must do this for _both_ nodes.
+
+You may create a container using the following command: 
+```shell script
+../vertx-jpa-cluster$ docker run -p 8080:8080 --name vertx-api-node vertx-api-node:1.2
+```  
+
+You will be able to connect to the API node at http://localhost:8080. As currently configured, the two containers must
+run in the same Podman or Kubernetes pod; the default bridge is sufficient for Docker.
 
 ## Configuring the Example
 The example includes a default configuration that creates 
@@ -45,7 +53,6 @@ variables or JRE system proprties (i.e. "-D" properties). The latter have a high
 | ----------------- | ------------------------------------------------------------ |
 | bind-port     | An integer value that sets the API verticle's TCP bind port. |
 | jpa-verticle-count | An integer value that speicified the number of JPA verticles to create; defaults to 2. | 
-| api-verticle-count | An integer value that speicified the number of API verticles to create; defaults to 1. |
 
 ## Running the Example
 Unless configured otherwise, the sample application presents a basic RESTful API on port TCP/8080 for a generic "Person" 
