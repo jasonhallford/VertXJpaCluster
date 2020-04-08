@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-infinispan</artifactId>
+            <artifactId>vertx-hazelcast</artifactId>
         </dependency>
         
         <!-- Hibernate and JDBC imports -->
@@ -73,7 +73,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>io.miscellanea.vertx.ApiDeployer</Main-Class>
+                                        <Main-Class>io.miscellanea.vertx.example.JpaDeployer</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

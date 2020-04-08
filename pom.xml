@@ -16,7 +16,7 @@
 
     <properties>
         <vertx.version>3.8.5</vertx.version>
-        <vertx.inifinispan.version>3.9.0</vertx.inifinispan.version>
+        <vertx.hazelcast.version>3.9.0</vertx.hazelcast.version>
         <hibernate.version>5.4.13.Final</hibernate.version>
     </properties>
 
@@ -40,8 +40,8 @@
             </dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
-                <artifactId>vertx-infinispan</artifactId>
-                <version>${vertx.inifinispan.version}</version>
+                <artifactId>vertx-hazelcast</artifactId>
+                <version>${vertx.hazelcast.version}</version>
             </dependency>
 
             <!-- Hibernate and JDBC imports -->

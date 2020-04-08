@@ -1,10 +1,11 @@
 package io.miscellanea.vertx.example;
 
+import com.hazelcast.core.Hazelcast;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.ext.cluster.infinispan.InfinispanClusterManager;
+import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ public class ApiDeployer {
 
   public static void main(String[] args) {
     // Bootstrap the infinispan cluster manager
-    var clusterMgr = new InfinispanClusterManager();
+    var clusterMgr = new HazelcastClusterManager();
 
     LOGGER.debug("Bootstrapping the Vert.x runtime in cluster mode..");
     var vertxOpts = new VertxOptions().setClusterManager(clusterMgr);
